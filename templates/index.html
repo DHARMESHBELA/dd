@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kotak Neo Signal</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#2b6cb0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <style>
+    body{font-family:Arial, sans-serif;text-align:center;padding:30px;}
+    .signal{display:inline-block;padding:20px;border-radius:10px;font-size:1.6rem;}
+    .buy{color:green;border:2px solid green;}
+    .sell{color:red;border:2px solid red;}
+    .hold{color:gray;border:2px solid gray;}
+  </style>
+</head>
+<body>
+  <h1>Kotak Neo Live Signal</h1>
+  <div id="sig" class="signal hold">Loading...</div>
+  <script>
+    async function fetchSig(){
+      try{
+        const res = await fetch('/signal');
+        const j = await res.json();
+        const el = document.getElementById('sig');
+        el.textContent = `${j.symbol}: ${j.signal} @ ${j.price}`;
+        el.className = `signal ${j.signal.toLowerCase()}`;
+      }catch(e){ console.log(e); }
+    }
+    fetchSig();
+    setInterval(fetchSig, 2000);
+
+    // Register service worker for PWA offline caching
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/static/service-worker.js')
+        .then(()=>console.log('SW registered'))
+        .catch(e=>console.log('SW reg failed', e));
+    }
+  </script>
+</body>
+</html>
